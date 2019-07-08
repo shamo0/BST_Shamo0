@@ -3,21 +3,18 @@ import random
 import sys
 
 class Node:
-    def __init__(self, data,priority) :
+    def __init__(self, data) :
         '''Initialize Node with data.'''
         self.data = data
         self.left = None
         self.right = None
-        self.priority = priority
+        self.priority = random.random()
 
     def __str__(self) :
         '''Return string representation of data.'''
         return str(self.data)
 
 class TreapSet:
-    def generate():
-        return random.random(0,1)
-
     def __init__(self):
         self.root = None
 
@@ -28,7 +25,7 @@ class TreapSet:
         node.right= node.right.left
         return right
 
-    def rightRot(self):
+    def rightRot(self,node):
         left = node.left
         node.left.right = left.right
         left.right= node
@@ -36,25 +33,29 @@ class TreapSet:
         return left
 
     def add(self,e):
-        self.root = self.__add(e,self.root,parent=None)
+        self.root= self.__add(e,self.root)
 
-    def __add(self,e,refNode,parent):
-        new = Node(e,self.generate())
+    def __add(self,e,refNode):
+        new = Node(e)
         if refNode==None:
-            self.root=new
-            return
+            newNode = new
+            return new
         if refNode.data==e:
             return refNode
         if e<refNode.data:
-            refNode.left = self.__add(e,refNode.left,refNode)
+            refNode.left = self.__add(e,refNode.left)
+            if refNode.left.priority>refNode.priority:
+                refNode=self.rightRot(refNode)
         else:
-            refNode.right = self.__add(e,refNode.right,refNode)
+            refNode.right = self.__add(e,refNode.right)
+            if refNode.right.priority>refNode.priority:
+                refNode=self.leftRot(refNode)
         return refNode
 
     def __contains__(self,element):
-        return self.__contains(self.__root,element)
+        return self.__contains(self.root,element)
 
-    def __contains(sright.leftelf,refNode,element):
+    def __contains(self,refNode,element):
         if (refNode==None): #BASE CASE: EMPTY SPOT
             return None
         elif (refNode.data == element):
@@ -66,8 +67,31 @@ class TreapSet:
         else:
             return False
 
-    def __len__(self):
-        ...
+    def child(self, nodes):
+        children = []
+        for node in nodes:
+            if node.left is not None:
+                children.append(node.left)
+            if node.right is not None:
+                children.append(node.right)
+        return children
 
     def height(self):
-        ...
+        if self.root is None:
+            return 0
+        height = 0
+        nodes = [self.root]
+        while len(nodes):
+            height+=1
+            nodes = self.child(nodes)
+        return height
+
+    def __len__(self):
+        if self.root is None:
+            return 0
+        len = 1
+        nodes = [self.root]
+        while len(nodes):
+            nodes = self.child(nodes)
+            len+=len(nodes)
+        return len
