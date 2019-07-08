@@ -17,6 +17,7 @@ class Node:
 class TreapSet:
     def __init__(self):
         self.root = None
+        self.count = 0
 
     def leftRot(self,node):
         right = node.right
@@ -31,9 +32,33 @@ class TreapSet:
         left.right= node
         node.left= node.left.right
         return left
+    #
+    # def balance(self,refNode):
+    #     print("in")
+    #     if refNode.left is None and refNode.right is None:
+    #         return
+    #     if refNode.left.priority<refNode.priority:
+    #         refNode=self.rightRot(refNode)
+    #         return balance(refNode)
+    #     elif refNode.right.priority>refNode.priority:
+    #         refNode=self.leftRot(refNode)
+    #         return balance(refNode)
+    #     return refNode
+
+    
+    # def moveUp(self,node,parent):
+    #     if parent == None:
+    #         return
+    #     if parent != None and node.priority >= parent.priority:
+    #         return
+    #     if node == parent.left:
+    #         self.rightRot(parent)
+    #     else:
+    #         self.leftRot(parent)
 
     def add(self,e):
-        self.root= self.__add(e,self.root)
+        self.count+=1
+        self.root=self.__add(e,self.root)
 
     def __add(self,e,refNode):
         new = Node(e)
@@ -44,12 +69,14 @@ class TreapSet:
             return refNode
         if e<refNode.data:
             refNode.left = self.__add(e,refNode.left)
-            if refNode.left.priority>refNode.priority:
-                refNode=self.rightRot(refNode)
+            refNode=self.moveUp(refNode.left,refNode)
+            # if refNode.left.priority<refNode.priority:
+            #     refNode=self.rightRot(refNode)
         else:
             refNode.right = self.__add(e,refNode.right)
-            if refNode.right.priority>refNode.priority:
-                refNode=self.leftRot(refNode)
+            refNode=self.moveUp(refNode.right,refNode)
+            # if refNode.right.priority<refNode.priority:
+            #     refNode=self.leftRot(refNode)
         return refNode
 
     def __contains__(self,element):
@@ -87,11 +114,4 @@ class TreapSet:
         return height
 
     def __len__(self):
-        if self.root is None:
-            return 0
-        len = 1
-        nodes = [self.root]
-        while len(nodes):
-            nodes = self.child(nodes)
-            len+=len(nodes)
-        return len
+        return self.count
