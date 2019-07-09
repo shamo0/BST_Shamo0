@@ -20,71 +20,50 @@ class TreapSet:
         self.count = 0
 
     def leftRot(self,node):
-        right = node.right
-        node.right.left = right.left
-        right.left= node
-        node.right= node.right.left
-        return right
+        '''Rotates the subtree to the left.'''
+        newParent = node.right
+        tmp = newParent.left
+        newParent.left = node
+        newParent.left.right = tmp
+        return newParent
+
 
     def rightRot(self,node):
-        left = node.left
-        node.left.right = left.right
-        left.right= node
-        node.left= node.left.right
-        return left
-    #
-    # def balance(self,refNode):
-    #     print("in")
-    #     if refNode.left is None and refNode.right is None:
-    #         return
-    #     if refNode.left.priority<refNode.priority:
-    #         refNode=self.rightRot(refNode)
-    #         return balance(refNode)
-    #     elif refNode.right.priority>refNode.priority:
-    #         refNode=self.leftRot(refNode)
-    #         return balance(refNode)
-    #     return refNode
-
-    
-    # def moveUp(self,node,parent):
-    #     if parent == None:
-    #         return
-    #     if parent != None and node.priority >= parent.priority:
-    #         return
-    #     if node == parent.left:
-    #         self.rightRot(parent)
-    #     else:
-    #         self.leftRot(parent)
+        '''Rotates the subtree to the right.'''
+        newParent = node.left
+        tmp = newParent.right
+        newParent.right = node
+        newParent.right.left = tmp
+        return newParent
 
     def add(self,e):
+        '''Inserts element into the tree'''
         self.count+=1
-        self.root=self.__add(e,self.root)
+        if self.root is None:
+            self.root =Node(e)
+        else:
+            self.root=self.__add(e,self.root)
 
     def __add(self,e,refNode):
-        new = Node(e)
-        if refNode==None:
-            newNode = new
-            return new
-        if refNode.data==e:
-            return refNode
-        if e<refNode.data:
+        if refNode is None:
+            return Node(e)
+        elif e<refNode.data:
             refNode.left = self.__add(e,refNode.left)
-            refNode=self.moveUp(refNode.left,refNode)
-            # if refNode.left.priority<refNode.priority:
-            #     refNode=self.rightRot(refNode)
+            if refNode.left.priority>refNode.priority:
+                return self.rightRot(refNode)
         else:
             refNode.right = self.__add(e,refNode.right)
-            refNode=self.moveUp(refNode.right,refNode)
-            # if refNode.right.priority<refNode.priority:
-            #     refNode=self.leftRot(refNode)
+            if refNode.right.priority>refNode.priority:
+                return self.leftRot(refNode)
         return refNode
 
     def __contains__(self,element):
+        '''Checks if the element is in the tree'''
         return self.__contains(self.root,element)
 
     def __contains(self,refNode,element):
         if (refNode==None): #BASE CASE: EMPTY SPOT
-            return None
+            return False
         elif (refNode.data == element):
             return True
         if (element<refNode.data):
@@ -94,24 +73,16 @@ class TreapSet:
         else:
             return False
 
-    def child(self, nodes):
-        children = []
-        for node in nodes:
-            if node.left is not None:
-                children.append(node.left)
-            if node.right is not None:
-                children.append(node.right)
-        return children
-
     def height(self):
-        if self.root is None:
+        '''Used for determining the height of the tree'''
+        return self.__height(self.root)
+
+    def __height(self,node):
+        if node is None:
             return 0
-        height = 0
-        nodes = [self.root]
-        while len(nodes):
-            height+=1
-            nodes = self.child(nodes)
-        return height
+        else:
+            return 1+max(self.__height(node.left),self.__height(node.right))
 
     def __len__(self):
+        '''Returns the number of items in tree'''
         return self.count
